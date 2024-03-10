@@ -1,10 +1,46 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System;
+using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 
 bool isLoggedIn = false;
 string userNameFromInput;
 string masterPasswordFromInput;
-List<String> adminPasswords = new List<string>() { "yes", "this", "is", "a", "password"};
-while (!isLoggedIn)
+
+string vaultKey = "";
+string sameSalt = "QiGjS6jCbraa9ztGLmDRtw==";
+
+
+string conString = "Data Source=DESKTOP-U5VBMMH; Initial Catalog=PasswordManager; Integrated Security = True;";
+
+
+
+//Console.WriteLine(EvaluateVaultkeyFromPasswordAndUsername("123", "username"));
+var returned = EvaluateVaultkeyFromPasswordAndUsername("123", "username");
+//InitiateStartup();
+Console.WriteLine(returned.Item1);
+Console.WriteLine(returned.Item2);
+void InitiateStartup()
+{
+    while (!isLoggedIn)
+    {
+        Console.WriteLine("Type LOGIN to login, type CREATE to create account");
+        string userLoginAction = Console.ReadLine();
+        if (userLoginAction == "LOGIN")
+        {
+            startLogin();
+        }
+        else
+        {
+            startCreateAccount();
+        }
+    }
+
+
+}
+
+void startLogin()
 {
     Console.WriteLine("Insert Credentials, please ");
     Console.Write("Username: ");
@@ -15,30 +51,119 @@ while (!isLoggedIn)
     {
         //if masterPassword.hash == database.user.passwordhash
         isLoggedIn = true;
+        Console.WriteLine("Logged in as" + userNameFromInput);
     }
 }
 
-if (isLoggedIn)
+void startCreateAccount()
 {
-    foreach (string passwords in adminPasswords)
+    Console.WriteLine("Insert desired Username, please");
+    Console.Write("Username: ");
+    string newUserName = Console.ReadLine();
+    Console.Write("password: ");
+    string newUserPassword = Console.ReadLine();
+    CreateNewAccount(newUserName, newUserPassword);
+}
+
+void CreateNewAccount(string userName, string userPassword)
+{
+    using (SqlConnection con = new SqlConnection(conString))
     {
-        Console.WriteLine(createNewPassword(passwords));
+        try
+        {
+            con.Open();
+            (string vaultKey, string salt) = EvaluateVaultkeyFromPasswordAndUsername(userPassword, userName);
+            string InsertQuery = "INSERT INTO Users (Username, vaultKey) VALUES (@NameValue, @KeyValue)"; //husk salt
+
+            using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
+            {
+                cmd.Parameters.AddWithValue("@Namevalue", userName);
+                cmd.Parameters.AddWithValue("@KeyValue", vaultKey);
+
+                Console.WriteLine(cmd.ExecuteNonQuery());
+            }
+            con.Close();
+        } catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
 
-else
+//returns the vaultKey + salt
+(string,string) EvaluateVaultkeyFromPasswordAndUsername(string passWord,string userName)
 {
-    Console.WriteLine("Not logged in");
+    byte[] salt = new byte[128 / 8];
+    using (var rng = RandomNumberGenerator.Create())
+    {
+        rng.GetBytes(salt);
+    }
+
+    byte[] trySalt = Convert.FromBase64String(sameSalt);
+    string hashedVaultKey = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+        password: passWord + userName,
+        salt: trySalt,
+        prf: KeyDerivationPrf.HMACSHA512,
+        iterationCount: 10,
+        numBytesRequested: 256 / 8)); //iterationCount should be way higher, but for testing purposes we start at 10
+
+    return (hashedVaultKey, Convert.ToBase64String(salt));
 }
 
+bool authenticateUserLogin(string userName, string userPassword)
+{
+    using (SqlConnection con = new SqlConnection(conString))
+    {
+        try
+        {
+            con.Open();
+            string selectQuery = "select AuthKey from Users where Username = @nameValue"; //husk salt
+            string authKeyResult = "";
+            using (SqlCommand cmd = new SqlCommand(selectQuery, con))
+            {
+                cmd.Parameters.AddWithValue("@namevalue", userName);
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            authKeyResult = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            con.Close();
 
-string createVaultKeyFromMasterPassword(string masterPassword)
-{
-    //create a vaultkey using some kind of function (hvad med auth med server når det er lokalt? :/)
-   
-    return masterPassword.GetHashCode() + "";
+            //and derive a vaultkey
+            string hashedVaultKey = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: userPassword + userName,
+                salt: Convert.FromBase64String(sameSalt),
+                prf: KeyDerivationPrf.HMACSHA512,
+                iterationCount: 10,
+                numBytesRequested: 256 / 8));
+
+            //now make an auth key from vaultkey
+            string authKey = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+        password: hashedVaultKey + userPassword,
+        salt: Convert.FromBase64String(sameSalt),
+        prf: KeyDerivationPrf.HMACSHA512,
+        iterationCount: 10,
+        numBytesRequested: 256 / 8)); //iterationCount should be way higher, but for testing purposes we start at 10
+
+            if (authKey == authKeyResult){
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return false;
+        }
+    }
 }
-string createNewPassword(string masterPassword)
-{
-    return masterPassword.GetHashCode() + "";
-}
+
