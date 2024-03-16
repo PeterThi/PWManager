@@ -14,13 +14,37 @@ string sameSalt = "QiGjS6jCbraa9ztGLmDRtw==";
 
 string conString = "Data Source=DESKTOP-U5VBMMH; Initial Catalog=PasswordManager; Integrated Security = True;";
 
+PasswordManager.PasswordManager pwm = new PasswordManager.PasswordManager();
+//pwm.createNewMasterPassword("strongpassword12345");
+Console.WriteLine(pwm.ValidatePassword("strongpassword12345"));
+/*
 
 
-//Console.WriteLine(EvaluateVaultkeyFromPasswordAndUsername("123", "username"));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var returned = EvaluateVaultkeyFromPasswordAndUsername("123", "username");
 //InitiateStartup();
 Console.WriteLine(returned.Item1);
 Console.WriteLine(returned.Item2);
+
+
+
 void InitiateStartup()
 {
     while (!isLoggedIn)
@@ -165,5 +189,5 @@ bool authenticateUserLogin(string userName, string userPassword)
             return false;
         }
     }
-}
+}*/
 
