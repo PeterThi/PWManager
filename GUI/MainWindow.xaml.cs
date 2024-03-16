@@ -16,15 +16,40 @@ namespace GUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        PasswordManager.PasswordManager passwordManager;
         public MainWindow()
         {
             InitializeComponent();
+            passwordManager = new PasswordManager.PasswordManager();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //validate password --> check DB if match
-            //if it does, initialize the listbox.
+            string inputPassword = passwordBox.Text;
+            if (passwordManager.ValidatePassword(inputPassword))
+            {
+                passwordManager.InMemoryEncryptionKey = passwordManager.deriveEncryptionKeyFromPassword(inputPassword);
+                Dictionary<string, string> result = passwordManager.getAllPasswordsInDatabase();
+                List<string> websites = new List<string>();
+                List<string> passwords = new List<string>();
+                foreach (string website in result.Keys)
+                {
+                     websites.Add( website);
+                }
+                foreach (string password in result.Values)
+                {
+                    passwords.Add( password );
+                }
+
+                websiteList.ItemsSource = websites;
+                passwordList.ItemsSource = passwords;
+
+
+            }
+            else
+            {
+                //show that we failed somehow
+            }
 
         }
     }

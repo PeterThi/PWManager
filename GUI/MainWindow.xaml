@@ -11,13 +11,21 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Enter Password:" Margin="10,69,589,-95"/>
-        <PasswordBox x:Name="passwordBox" Margin="110,69,502,-78"/>
+        <Label Content="Enter Password:" Margin="67,67,532,-93"/>
+        <TextBox x:Name="passwordBox" Margin="170,61,442,-70"/>
 
-        <Button Content="Submit" Margin="317,69,437,-81" Click="Button_Click"/>
-
-        <ListBox Grid.Row="2" Margin="10">
-
+        <Button Content="Login" Margin="377,61,333,-73" Click="Button_Click"/>
+        
+        <Label Content="Website name" Margin="67,152,-67,-152" />
+        <ListBox x:Name="websiteList" Margin="67,183,589,-229"/>
+        
+        <Label Content="Decrypted Password" Margin="259,152,-259,-152" />
+        <ListBox x:Name="passwordList" Margin="259,183,175,-229" SelectionMode="Single">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBox Text="{Binding Path=.}" IsReadOnly="True"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
     </Grid>
 </Window>

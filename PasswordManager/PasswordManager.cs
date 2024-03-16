@@ -12,7 +12,7 @@ namespace PasswordManager
     public class PasswordManager
     {
         string conString = "Data Source=DESKTOP-U5VBMMH; Initial Catalog=PasswordManager; Integrated Security = True;";
-
+        public string InMemoryEncryptionKey = "";
         public PasswordManager() { }
 
         public bool ValidatePassword(string inputPassword)
@@ -72,7 +72,7 @@ namespace PasswordManager
                 try
                 {
                     con.Open();
-                    string selectQuery = "select * from Users"; 
+                    string selectQuery = "select * from Users";
                     string vaultKeyResult = "";
                     string saltResult = "";
                     string IVResult = "";
@@ -95,7 +95,7 @@ namespace PasswordManager
 
                     con.Close();
 
-                    return (vaultKeyResult, saltResult, IVResult); 
+                    return (vaultKeyResult, saltResult, IVResult);
                 }
                 catch (Exception ex)
                 {
@@ -141,35 +141,35 @@ namespace PasswordManager
                         encryptedVaultKey = msEncrypt.ToArray();
                     }
                 }
-            
-            //store Vaultkey + salt + IV in database for later use.
 
-            using (SqlConnection con = new SqlConnection(conString))
-            {
-                try
+                //store Vaultkey + salt + IV in database for later use.
+
+                using (SqlConnection con = new SqlConnection(conString))
                 {
-                    con.Open();
-                    string InsertQuery = "INSERT INTO Users (vaultKey, salt, IV) VALUES (@KeyValue, @salt, @IV)"; //husk salt
-
-                    using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
+                    try
                     {
-                        cmd.Parameters.AddWithValue("@KeyValue",Convert.ToBase64String(encryptedVaultKey));
-                        cmd.Parameters.AddWithValue("@salt", salt);
-                        cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(aes.IV));
+                        con.Open();
+                        string InsertQuery = "INSERT INTO Users (vaultKey, salt, IV) VALUES (@KeyValue, @salt, @IV)"; //husk salt
 
-                        Console.WriteLine(cmd.ExecuteNonQuery());
+                        using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
+                        {
+                            cmd.Parameters.AddWithValue("@KeyValue", Convert.ToBase64String(encryptedVaultKey));
+                            cmd.Parameters.AddWithValue("@salt", salt);
+                            cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(aes.IV));
+
+                            Console.WriteLine(cmd.ExecuteNonQuery());
+                        }
+
+                        con.Close();
+
+
                     }
 
-                    con.Close();
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
 
-
-                }
-
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-
-                }
+                    }
                 }
 
             }
@@ -194,7 +194,7 @@ namespace PasswordManager
             return (Convert.ToBase64String(EncryptionKey), Convert.ToBase64String(salt));
         }
 
-        public Dictionary<string,string> getAllPasswordsInDatabase()
+        public Dictionary<string, string> getAllPasswordsInDatabase()
         {
             using (SqlConnection con = new SqlConnection(conString))
             {
@@ -221,13 +221,104 @@ namespace PasswordManager
                     }
 
                     con.Close();
+                    Dictionary<string, string> decryptedDict = new Dictionary<string, string>();
                     //foreach dict-Value: decrypt and add into new array.
-                    return dict;
+                    foreach (KeyValuePair<string, string> kvp in dict)
+                    {
+                        if (kvp.Value != null)
+                        {
+                            decryptedDict.Add(kvp.Key, decryptWebsitePassword(kvp.Value));
+                        }
+                    }
+                    return decryptedDict;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                     return null;
+                }
+
+            }
+        }
+
+        public string decryptWebsitePassword(string encryptedPassword)
+        {
+            string ivFromDatabase = getEncryptedVaultKeyAndSaltFromDatabase().Item3;
+            string result = "";
+            //InMemoryEncryptionKey = deriveEncryptionKeyFromPassword("strongpassword12345"); //remove after
+            using (Aes aes = Aes.Create())
+            {
+                ICryptoTransform decryptor = aes.CreateDecryptor(Convert.FromBase64String(InMemoryEncryptionKey), Convert.FromBase64String(ivFromDatabase));
+
+                using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(encryptedPassword)))
+                {
+                    using(CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using(StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            result = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+
+            }
+            return result;
+        }
+        public void createNewWebsitePassword(string websiteName, int length)
+        {
+            var result = getEncryptedVaultKeyAndSaltFromDatabase();
+            string IVFromDatabase = result.Item3;
+
+            byte[] randomPassword = new byte[length];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomPassword);
+            }
+
+            //InMemoryEncryptionKey = deriveEncryptionKeyFromPassword("strongpassword12345"); //remove later
+            byte[] encryptedPasswordBytes;
+            using (Aes aes = Aes.Create())
+            {
+                aes.Mode = CipherMode.CBC;
+                ICryptoTransform encryptor = aes.CreateEncryptor(Convert.FromBase64String(InMemoryEncryptionKey), Convert.FromBase64String(IVFromDatabase)); //IV has to somehow be the same
+
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter sw = new StreamWriter(csEncrypt))
+                        {
+                            sw.Write(Convert.ToBase64String(randomPassword));
+                        }
+                        encryptedPasswordBytes = msEncrypt.ToArray();
+                    }
+                }
+            }
+
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                try
+                {
+                    con.Open();
+                    string InsertQuery = "INSERT INTO passwords (website, EncryptedPasswords) VALUES (@WebsiteNameValue, @EncryptedPasswordValue)"; //husk salt
+
+                    using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
+                    {
+                        cmd.Parameters.AddWithValue("@WebsiteNameValue", websiteName);
+                        cmd.Parameters.AddWithValue("@EncryptedPasswordValue", Convert.ToBase64String(encryptedPasswordBytes));
+
+                        Console.WriteLine(cmd.ExecuteNonQuery());
+                    }
+
+                    con.Close();
+
+
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+
                 }
 
             }

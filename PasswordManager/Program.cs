@@ -16,7 +16,13 @@ string conString = "Data Source=DESKTOP-U5VBMMH; Initial Catalog=PasswordManager
 
 PasswordManager.PasswordManager pwm = new PasswordManager.PasswordManager();
 //pwm.createNewMasterPassword("strongpassword12345");
-Console.WriteLine(pwm.ValidatePassword("strongpassword12345"));
+//Console.WriteLine(pwm.ValidatePassword("strongpassword12345"));
+pwm.createNewWebsitePassword("Temu", 16);
+pwm.createNewWebsitePassword("Twitch", 16);
+foreach (string passwords in pwm.getAllPasswordsInDatabase().Values)
+{
+    Console.WriteLine(passwords);
+}
 /*
 
 
