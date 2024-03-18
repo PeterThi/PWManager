@@ -27,5 +27,12 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <Label Margin="10,283,-10,-283" Content="Create new website password"> </Label>
+        <Label Margin="10,314,-10,-314" Content="Enter domain name:"></Label>
+        <TextBox x:Name="websiteNameInput" Margin="139,320,473,-307" IsEnabled ="false"/>
+        <Label Margin="10,343,-10,-343" Content="Enter minimum password length:"></Label>
+        <TextBox x:Name="passwordLengthInput" Margin="200,345,412,-332" IsEnabled ="false"/>
+        <Button x:Name="CreatePasswordButton" Content="Create Password" Margin="10,374,700,-372" Click="ClickCreatePassword" IsEnabled ="false"/>
     </Grid>
 </Window>

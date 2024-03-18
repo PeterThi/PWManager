@@ -3,18 +3,18 @@
   "WorkspaceRootPath": "C:\\Users\\pete9\\source\\repos\\PWManager\\PasswordManager\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{25FD687D-BBB9-4A41-B10A-AF54AAB01BA9}|..\\GUI\\GUI.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\gui\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25FD687D-BBB9-4A41-B10A-AF54AAB01BA9}|..\\GUI\\GUI.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\gui\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{AC11CD8A-5DE2-41F4-9040-3A98C87FEB98}|PasswordManager.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\passwordmanager\\passwordmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AC11CD8A-5DE2-41F4-9040-3A98C87FEB98}|PasswordManager.csproj|solutionrelative:passwordmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{AC11CD8A-5DE2-41F4-9040-3A98C87FEB98}|PasswordManager.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\passwordmanager\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AC11CD8A-5DE2-41F4-9040-3A98C87FEB98}|PasswordManager.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{25FD687D-BBB9-4A41-B10A-AF54AAB01BA9}|..\\GUI\\GUI.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\gui\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{25FD687D-BBB9-4A41-B10A-AF54AAB01BA9}|..\\GUI\\GUI.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\gui\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{AC11CD8A-5DE2-41F4-9040-3A98C87FEB98}|PasswordManager.csproj|c:\\users\\pete9\\source\\repos\\pwmanager\\passwordmanager\\passwordmanager.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
@@ -31,7 +31,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -39,7 +39,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "PasswordManager.cs",
               "DocumentMoniker": "C:\\Users\\pete9\\source\\repos\\PWManager\\PasswordManager\\PasswordManager.cs",
               "RelativeDocumentMoniker": "PasswordManager.cs",
@@ -59,30 +59,33 @@
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\App.xaml",
               "RelativeToolTip": "..\\GUI\\App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-15T13:34:16.99Z"
+              "WhenOpened": "2024-03-15T13:34:16.99Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\MainWindow.xaml",
               "RelativeDocumentMoniker": "..\\GUI\\MainWindow.xaml",
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\MainWindow.xaml",
               "RelativeToolTip": "..\\GUI\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-15T13:33:37.649Z"
+              "WhenOpened": "2024-03-15T13:33:37.649Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "..\\GUI\\MainWindow.xaml.cs",
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\MainWindow.xaml.cs",
               "RelativeToolTip": "..\\GUI\\MainWindow.xaml.cs",
-              "ViewState": "AQIAABMAAAAAAAAAAAA5wCEAAAA8AAAA",
+              "ViewState": "AQIAABIAAAAAAAAAAAAswFwAAAAqAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-15T13:33:37.041Z"
+              "WhenOpened": "2024-03-15T13:33:37.041Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -98,7 +101,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\pete9\\source\\repos\\PWManager\\PasswordManager\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -106,8 +109,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AQIAAAMAAAAAAAAAAAAAABYAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T13:51:05.255Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-07T13:51:05.255Z"
             }
           ]
         }
