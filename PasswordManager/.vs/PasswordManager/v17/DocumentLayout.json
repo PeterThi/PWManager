@@ -45,7 +45,7 @@
               "RelativeDocumentMoniker": "PasswordManager.cs",
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\PasswordManager\\PasswordManager.cs",
               "RelativeToolTip": "PasswordManager.cs",
-              "ViewState": "AQIAAAsAAAAAAAAAAAAxwBkAAAAAAAAA",
+              "ViewState": "AQIAAAUBAAAAAAAAAAAuwBgBAAArAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-03-15T13:54:16.399Z",
               "EditorCaption": ""
@@ -59,8 +59,7 @@
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\App.xaml",
               "RelativeToolTip": "..\\GUI\\App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-15T13:34:16.99Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-15T13:34:16.99Z"
             },
             {
               "$type": "Document",
@@ -71,8 +70,7 @@
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\GUI\\MainWindow.xaml",
               "RelativeToolTip": "..\\GUI\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-15T13:33:37.649Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-15T13:33:37.649Z"
             },
             {
               "$type": "Document",
@@ -84,8 +82,7 @@
               "RelativeToolTip": "..\\GUI\\MainWindow.xaml.cs",
               "ViewState": "AQIAABMAAAAAAAAAAAA5wCEAAAA8AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-15T13:33:37.041Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-15T13:33:37.041Z"
             },
             {
               "$type": "Document",
@@ -97,8 +94,7 @@
               "RelativeToolTip": "PasswordManager.csproj",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAKAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-03-08T14:19:30.208Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-08T14:19:30.208Z"
             },
             {
               "$type": "Document",
@@ -108,7 +104,7 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\pete9\\source\\repos\\PWManager\\PasswordManager\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAABMAAAApAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAABYAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-03-07T13:51:05.255Z",
               "EditorCaption": ""

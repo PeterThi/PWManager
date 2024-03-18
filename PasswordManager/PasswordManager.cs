@@ -264,15 +264,21 @@ namespace PasswordManager
             }
             return result;
         }
-        public void createNewWebsitePassword(string websiteName, int length)
+        public void createNewWebsitePassword(string websiteName, int minimumLength)
         {
             var result = getEncryptedVaultKeyAndSaltFromDatabase();
             string IVFromDatabase = result.Item3;
 
-            byte[] randomPassword = new byte[length];
-            using (var rng = RandomNumberGenerator.Create())
+            List<string> allEnglishWords = new List<string>() { "Cat", "Dog", "mouse", "House", "Elf", "Shelf", "Lorem", "Ipsum" };
+            string password ="";
+            Random random = new Random();
+            for (int i =0; i<3; i++)
             {
-                rng.GetBytes(randomPassword);
+                password += allEnglishWords[random.Next(0, allEnglishWords.Count)];
+            }
+            while (password.Length < minimumLength)
+            {
+                password += random.Next(9);
             }
 
             //InMemoryEncryptionKey = deriveEncryptionKeyFromPassword("strongpassword12345"); //remove later
@@ -288,7 +294,7 @@ namespace PasswordManager
                     {
                         using (StreamWriter sw = new StreamWriter(csEncrypt))
                         {
-                            sw.Write(Convert.ToBase64String(randomPassword));
+                            sw.Write(password);
                         }
                         encryptedPasswordBytes = msEncrypt.ToArray();
                     }
@@ -300,7 +306,7 @@ namespace PasswordManager
                 try
                 {
                     con.Open();
-                    string InsertQuery = "INSERT INTO passwords (website, EncryptedPasswords) VALUES (@WebsiteNameValue, @EncryptedPasswordValue)"; //husk salt
+                    string InsertQuery = "INSERT INTO passwords (website, EncryptedPasswords) VALUES (@WebsiteNameValue, @EncryptedPasswordValue)"; 
 
                     using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
                     {
