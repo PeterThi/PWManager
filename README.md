@@ -60,4 +60,5 @@ With this application being strictly local, it would require an attacker to some
 Another possible pitfall, is that the application, once logged in, will show you your passwords in plain text. This could easily be spotted by another human in the vicinity of the monitor, or spotted by any malware on the computer with access to your screen. This is however another trade-off with the user experience, because the whole point of the password manager is to show you your password. I'm sure, however, the passwords could be shown more subtlely than in my application.
 <br>
 The generated passwords are at the moment a huge pitfall as well, by only having a handful of words to generate the passwords from. The dream scenario would feature more words with a mix of capital letters and numbers inbetween - eventhough this would decrease the rememberability of the passwords. 
+The master password itself is a major pitfall as well, due to lack of restrictions. The masterpassword could in theory be a single character, which is definitely not advised. 
 
