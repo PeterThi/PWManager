@@ -11,27 +11,24 @@ namespace PasswordManager
 {
     public class PasswordManager
     {
-        string conString = "Data Source=DESKTOP-U5VBMMH; Initial Catalog=PasswordManager; Integrated Security = True;";
+        string conString = "Data Source=DESKTOP-U5VBMMH; Initial Catalog=PasswordManager; Integrated Security = True;"; //Only works on my machine!
         public string InMemoryEncryptionKey = "";
         public PasswordManager() { }
 
+        //used to validate inputted masterpassword. If input is the correct password, user is logged in from GUI
         public bool ValidatePassword(string inputPassword)
         {
             var result = getEncryptedVaultKeyAndSaltFromDatabase();
             string KeyInDatabase = result.Item1;
             string IVFromDatabase = result.Item3;
 
-            Console.WriteLine("Database Key (vault):" + KeyInDatabase);
-            Console.WriteLine("IV from database:" + IVFromDatabase);
-
             string EncryptionKey = deriveEncryptionKeyFromPassword(inputPassword);
 
-            Console.WriteLine("Encryption KEy:" + EncryptionKey);
             byte[] encryptedVaultKey;
             using (Aes aes = Aes.Create())
             {
                 aes.Mode = CipherMode.CBC;
-                ICryptoTransform encryptor = aes.CreateEncryptor(Convert.FromBase64String(EncryptionKey), Convert.FromBase64String(IVFromDatabase)); //IV has to somehow be the same
+                ICryptoTransform encryptor = aes.CreateEncryptor(Convert.FromBase64String(EncryptionKey), Convert.FromBase64String(IVFromDatabase));
 
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
@@ -45,10 +42,10 @@ namespace PasswordManager
                     }
                 }
             }
-            Console.WriteLine("Derived VaultKey:" + Convert.ToBase64String(encryptedVaultKey));
             return Convert.ToBase64String(encryptedVaultKey) == KeyInDatabase;
         }
 
+        //Derives encryptionkey from masterpassword
         public string deriveEncryptionKeyFromPassword(string inputPassword)
         {
             var result = getEncryptedVaultKeyAndSaltFromDatabase();
@@ -60,11 +57,13 @@ namespace PasswordManager
                 password: inputPassword.Trim(),
                 salt: Convert.FromBase64String(SaltInDatabase),
                 prf: KeyDerivationPrf.HMACSHA512,
-                iterationCount: 10,
+                iterationCount: 1000,
                 numBytesRequested: 256 / 8));
 
             return Convert.ToBase64String(EncryptionKey);
         }
+
+        //returns vault key, salt and IV from database in that order.
         public (string, string, string) getEncryptedVaultKeyAndSaltFromDatabase()
         {
             using (SqlConnection con = new SqlConnection(conString))
@@ -100,12 +99,13 @@ namespace PasswordManager
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    return ("nothing", "", "");
+                    return ("", "", "");
                 }
 
             }
         }
 
+        //Derives encryptionkey from input --> derives vault key from encryptionkey --> stores vaultkey, salt and IV in database. 
         public void createNewMasterPassword(string inputPassword)
         {
             //derive encryptionKey from password
@@ -113,8 +113,7 @@ namespace PasswordManager
             string encryptionKey = result.Item1;
             string salt = result.Item2;
 
-            Console.WriteLine("enc key" + encryptionKey);
-            //create custom IV for length
+            //create custom IV to ensure length of key
             byte[] ivToInject = new byte[16];
             using (var rng = RandomNumberGenerator.Create())
             {
@@ -126,9 +125,8 @@ namespace PasswordManager
             using (Aes aes = Aes.Create())
             {
                 aes.IV = ivToInject;
-                Console.WriteLine("Injected IV: " + ivToInject);
                 aes.Mode = CipherMode.CBC;
-                ICryptoTransform encryptor = aes.CreateEncryptor(Convert.FromBase64String(encryptionKey), aes.IV); //IV has to somehow be the same
+                ICryptoTransform encryptor = aes.CreateEncryptor(Convert.FromBase64String(encryptionKey), aes.IV); 
 
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
@@ -149,7 +147,7 @@ namespace PasswordManager
                     try
                     {
                         con.Open();
-                        string InsertQuery = "INSERT INTO Users (vaultKey, salt, IV) VALUES (@KeyValue, @salt, @IV)"; //husk salt
+                        string InsertQuery = "INSERT INTO Users (vaultKey, salt, IV) VALUES (@KeyValue, @salt, @IV)"; 
 
                         using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
                         {
@@ -157,7 +155,6 @@ namespace PasswordManager
                             cmd.Parameters.AddWithValue("@salt", salt);
                             cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(aes.IV));
 
-                            Console.WriteLine(cmd.ExecuteNonQuery());
                         }
 
                         con.Close();
@@ -175,6 +172,7 @@ namespace PasswordManager
             }
         }
 
+        //helper method to derive encryptionkey and initialize salt from password.
         public (string, string) createNewEncryptionKeyAndSaltFromPassword(string inputPassword)
         {
             byte[] salt = new byte[128 / 8];
@@ -188,12 +186,13 @@ namespace PasswordManager
                 password: inputPassword.Trim(),
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA512,
-                iterationCount: 10,
+                iterationCount: 1000,
                 numBytesRequested: 256 / 8));
 
             return (Convert.ToBase64String(EncryptionKey), Convert.ToBase64String(salt));
         }
-
+        
+        //fetches all passwords from database, and returns them decrypted in plain text
         public Dictionary<string, string> getAllPasswordsInDatabase()
         {
             using (SqlConnection con = new SqlConnection(conString))
@@ -203,7 +202,7 @@ namespace PasswordManager
                     Dictionary<string, string> dict = new Dictionary<string, string>();
 
                     con.Open();
-                    string selectQuery = "select * from passwords"; //husk salt
+                    string selectQuery = "select * from passwords";
                     string vaultKeyResult = "";
                     using (SqlCommand cmd = new SqlCommand(selectQuery, con))
                     {
@@ -241,20 +240,20 @@ namespace PasswordManager
             }
         }
 
+        //Helper method to decrypt website/domain passwords
         public string decryptWebsitePassword(string encryptedPassword)
         {
             string ivFromDatabase = getEncryptedVaultKeyAndSaltFromDatabase().Item3;
             string result = "";
-            //InMemoryEncryptionKey = deriveEncryptionKeyFromPassword("strongpassword12345"); //remove after
             using (Aes aes = Aes.Create())
             {
                 ICryptoTransform decryptor = aes.CreateDecryptor(Convert.FromBase64String(InMemoryEncryptionKey), Convert.FromBase64String(ivFromDatabase));
 
                 using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(encryptedPassword)))
                 {
-                    using(CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
-                        using(StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
                             result = srDecrypt.ReadToEnd();
                         }
@@ -264,15 +263,18 @@ namespace PasswordManager
             }
             return result;
         }
+
+        // Saves a new website password in database.
+
         public void createNewWebsitePassword(string websiteName, int minimumLength)
         {
             var result = getEncryptedVaultKeyAndSaltFromDatabase();
             string IVFromDatabase = result.Item3;
 
             List<string> allEnglishWords = new List<string>() { "Cat", "Dog", "mouse", "House", "Elf", "Shelf", "Lorem", "Ipsum" };
-            string password ="";
+            string password = "";
             Random random = new Random();
-            for (int i =0; i<3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 password += allEnglishWords[random.Next(0, allEnglishWords.Count)];
             }
@@ -281,7 +283,6 @@ namespace PasswordManager
                 password += random.Next(9);
             }
 
-            //InMemoryEncryptionKey = deriveEncryptionKeyFromPassword("strongpassword12345"); //remove later
             byte[] encryptedPasswordBytes;
             using (Aes aes = Aes.Create())
             {
@@ -306,14 +307,14 @@ namespace PasswordManager
                 try
                 {
                     con.Open();
-                    string InsertQuery = "INSERT INTO passwords (website, EncryptedPasswords) VALUES (@WebsiteNameValue, @EncryptedPasswordValue)"; 
+                    string InsertQuery = "INSERT INTO passwords (website, EncryptedPasswords) VALUES (@WebsiteNameValue, @EncryptedPasswordValue)";
 
                     using (SqlCommand cmd = new SqlCommand(InsertQuery, con))
                     {
                         cmd.Parameters.AddWithValue("@WebsiteNameValue", websiteName);
                         cmd.Parameters.AddWithValue("@EncryptedPasswordValue", Convert.ToBase64String(encryptedPasswordBytes));
 
-                        Console.WriteLine(cmd.ExecuteNonQuery());
+
                     }
 
                     con.Close();
@@ -327,6 +328,56 @@ namespace PasswordManager
 
                 }
 
+            }
+        }
+
+        //helper method in GUI to check if user is already created to ensure there can't be two master passwords (from gui atleast)
+        public bool checkIfUserCreated()
+        {
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                try
+                {
+
+                    con.Open();
+                    string selectQuery = "select Count(*) from Users";
+
+                    using (SqlCommand cmd = new SqlCommand(selectQuery, con))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            
+                            if (reader.HasRows)
+                            {
+                                reader.Read();
+                                int count = reader.GetInt32(0);
+                                if (count > 0)
+                                {
+                                    con.Close();
+                                    return true;
+                                }
+                                else {
+                                    con.Close();
+                                    return false;
+
+                                }
+
+                            }
+                            else
+                            {
+                                return false;
+                            }
+
+                        }
+
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return false;
+                }
             }
         }
     }

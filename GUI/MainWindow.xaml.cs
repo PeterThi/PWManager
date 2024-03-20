@@ -21,6 +21,7 @@ namespace GUI
         {
             InitializeComponent();
             passwordManager = new PasswordManager.PasswordManager();
+            initializeMasterPasswordBox();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -33,23 +34,28 @@ namespace GUI
                 Dictionary<string, string> result = passwordManager.getAllPasswordsInDatabase();
                 List<string> websites = new List<string>();
                 List<string> passwords = new List<string>();
-                foreach (string website in result.Keys)
+                if (result!= null)
                 {
-                     websites.Add( website);
-                }
-                foreach (string password in result.Values)
-                {
-                    passwords.Add( password );
-                }
+                    foreach (string website in result.Keys)
+                    {
+                        websites.Add(website);
+                    }
+                    foreach (string password in result.Values)
+                    {
+                        passwords.Add(password);
+                    }
 
-                websiteList.ItemsSource = websites;
-                passwordList.ItemsSource = passwords;
+                    websiteList.ItemsSource = websites;
+                    passwordList.ItemsSource = passwords;
+                }
+                AlertLabel.Content = "User Authenticated";
+
 
 
             }
             else
             {
-                //show that we failed somehow
+                AlertLabel.Content = "Wrong password";
             }
 
         }
@@ -59,23 +65,27 @@ namespace GUI
             try
             {
                 Dictionary<string, string> result = passwordManager.getAllPasswordsInDatabase();
-                List<string> websites = new List<string>();
-                List<string> passwords = new List<string>();
-                foreach (string website in result.Keys)
+                if (result != null)
                 {
-                    websites.Add(website);
-                }
-                foreach (string password in result.Values)
-                {
-                    passwords.Add(password);
-                }
+                    List<string> websites = new List<string>();
+                    List<string> passwords = new List<string>();
+                    foreach (string website in result.Keys)
+                    {
+                        websites.Add(website);
+                    }
+                    foreach (string password in result.Values)
+                    {
+                        passwords.Add(password);
+                    }
 
-                websiteList.ItemsSource = websites;
-                passwordList.ItemsSource = passwords;
+                    websiteList.ItemsSource = websites;
+                    passwordList.ItemsSource = passwords;
+                }
+               
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                AlertLabel.Content = "Couldn't fetch passwords";
             }
 
         }
@@ -88,6 +98,7 @@ namespace GUI
 
             passwordManager.createNewWebsitePassword(inputWebsiteName, inputLength);
             updatePWList();
+            AlertLabel.Content = "New Website Password Created!";
         }
 
         private void setEverythingActive()
@@ -95,6 +106,27 @@ namespace GUI
             websiteNameInput.IsEnabled = true;
             passwordLengthInput.IsEnabled = true;
             CreatePasswordButton.IsEnabled = true;
+        }
+
+        private void ClickCreateMasterPassword(object sender, RoutedEventArgs e)
+        {
+            if (newMasterPasswordBox.Text != "")
+            {
+                passwordManager.createNewMasterPassword(newMasterPasswordBox.Text);
+                initializeMasterPasswordBox();
+                newMasterPasswordBox.Text = "";
+                AlertLabel.Content = "New User created";
+            }
+            
+        }
+
+        private void initializeMasterPasswordBox()
+        {
+            if (passwordManager.checkIfUserCreated())
+            {
+                newMasterPasswordBox.IsEnabled = false;
+            }
+            
         }
     }
 }
