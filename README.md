@@ -1,34 +1,8 @@
 # PWManager
 
-<h1> Part one</h1>
-
-First the manager is going to require the user to sign up. I have chosen to do this using a Username and a MasterPassword, which the user has to input. This will create a user using the following flow:
-
-![pwManagerCreate](https://github.com/PeterThi/PWManager/assets/60512162/1917a917-bd81-4ce1-83dd-11fcf8d4ad6a)
-
-from this we get two keys: an Authentication Key and a Vault Key. The Authentication key is later used to authenticate the user, which is why it will be stored in a local database. The Vault Key will not be stored in the database, as that is a secret used to encrypt and decrypt passwords later.
-
-After this, the user will have to log in to the application using their credentials again. The flow looks like this: 
-
-![pwManagerLogin](https://github.com/PeterThi/PWManager/assets/60512162/8fa2caa5-126e-4765-8ed9-f21baa9ee101)
-
-We go through the same steps as in the create function, so that we can derive a new AuthenticationKey. We will then compare the two authentication keys, and if they're a match, the user will be validated and logged in to the manager.
-
-From here, the user will be able to manage their passwords. First of all, they will need to be able to create a new password in the system. This flow should look like this:
-
-![pwManagerNewPassword](https://github.com/PeterThi/PWManager/assets/60512162/b74b3da4-9b8b-4af3-a4bc-0ccb5aea5a24)
-
-In this flow we will generate a string of a set length using random letters and numbers - preferably mixing upper and lower case. This string is then encrypted using the derived VaultKey from the credentials, and stored encrypted in the database. When creating a password, the user can input the name of the website that the password is gonna correspond with for a better user experience. I have chosen not to include usernames or e-mails in this as a last resort if this manager should be compromised in some way. 
-
-Finally, the manager must show the user their passwords with their corresponding websites in a list-like display (when logged in of course). Flow:
-
-![pwManagerViewPasswords](https://github.com/PeterThi/PWManager/assets/60512162/c170198e-bc89-4bce-98a9-6c62b224f3f9)
-
-if the user is logged in, we will gather all encrypted passwords from the database. Here the manager will decrypt them all using the derived vault key from earlier. The application will then list all passwords in plain text together with their corresponding website-name for easy access. 
-
 <h1> Part Two </h1>
 <h1> Presentation of the product</h1>
-The very simple GUI I've made is quite a bundled up mess, so I will present it bit by bit.
+For simplicity's sake, the GUI is made up of a single window, which makes it a little compact. For that reason, I'll present it bit by bit.
 
 <h2> Create Master Password</h2>
 The first thing a user will have to do, is to create a new masterpassword, that the user itself will have to remember. This password will open up the password manager.
@@ -36,12 +10,19 @@ This use case is handled through a simple textbox and button in the GUI:
 
 ![CreateMasterPass](https://github.com/PeterThi/PWManager/assets/60512162/8f1de266-5811-48a4-80bf-6eacd919c38e)
 
-The button calls an eventhandler, which calls the manager's "createNewMasterPassword" function using the supplied text from the textbox.
+The button calls an eventhandler, which calls the manager's "createNewMasterPassword" function using the supplied text from the textbox. The following flow is outlined on this model:
+
+![NEWMasterPassword](https://github.com/PeterThi/PWManager/assets/60512162/3aecd384-57b2-428d-87b2-774a4bd6bfbc)
+
 
 <h2> Login </h2>
-The login interface is very similar, with a button calling the "ValidateUser" function. To get access to your passwords, insert the same text from when you created your password
+The login interface is very similar, with a button calling the "ValidateUser" function. To get access to your passwords, the user must insert the same text from when you created your password
 
 ![Login](https://github.com/PeterThi/PWManager/assets/60512162/d2f0cfa5-ceca-4dc7-8666-5c6a4325a0b9)
+
+The flow looks like this:
+
+![NEWLogin](https://github.com/PeterThi/PWManager/assets/60512162/e8f98722-bd4c-41e1-91f3-787d6fc4b40d)
 
 <h2> Show passwords </h2>
 When logged in, your passwords will be shown to you in plain text. For added comfort, the plaintext is displayed in an unmodifiable textbox, which makes it possible to copy the password to the clipboard, so the user can paste it into their matching website when needed. 
@@ -49,11 +30,19 @@ Every password has a corresponding domain name, where the password is inteded to
 
 ![password](https://github.com/PeterThi/PWManager/assets/60512162/95ac0db9-6294-44a8-963e-3a8c486a0c12)
 
+Flow:
+
+![NEWVIewPassword](https://github.com/PeterThi/PWManager/assets/60512162/053d219c-c3ef-435b-b915-720c29ead21c)
+
+
 <h2> Create new password </h2>
 Finally, the user is welcome to create a new password for any domain they want. The user may input a preferred length of the generated password to fit any restrictions the domain might have. If nothing is specified, it defaults to 16 characters.
 All passwords are currently generated by the application, consisting of 3 randomly chosen english words, and possibly some numbers at the end. For simplicity, only a handful of words are in the selection pool, but in a real application, you would preferably use the full English dictionary or something similar. 
 
 ![createWebsitePass](https://github.com/PeterThi/PWManager/assets/60512162/61f33db3-318e-4fc1-b036-8af91410e91f)
+
+![NEWWebsitePassword](https://github.com/PeterThi/PWManager/assets/60512162/352e7d3b-1266-4262-a12d-f2df4ca9d7b1)
+
 
 The full WPF page looks like this:
 ![Full](https://github.com/PeterThi/PWManager/assets/60512162/6fa71f34-e229-4698-a3f3-e5edea97907e)
