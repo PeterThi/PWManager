@@ -1,6 +1,12 @@
 # PWManager
 
 <h1> Part Two </h1>
+
+<h2> How to Run </h2>
+The solution consists of two c# projects - one for business logic (PasswordManager) and the GUI. To run the program, simply run the GUI project. You will then need to create a new masterpassword following the steps below.
+
+*NOTE*: The manager is set up to store values in a local MSSQL Server database, connected by a connectionstring. For values to be stored, and be able to be validated, you need to set up the connectionstring and database. 
+
 <h1> Presentation of the product</h1>
 For simplicity's sake, the GUI is made up of a single window, which makes it a little compact. For that reason, I'll present it bit by bit.
 
